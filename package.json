@@ -1,0 +1,9 @@
+{
+  "name": "t2gcs-backend",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "API de tarefas para demonstracao de deploy",
+  "engines": { "node": ">=24 <25" },
+  "scripts": { "start": "node src/server.js", "dev": "node --watch src/server.js", "test": "node --test" }
+}
