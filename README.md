@@ -1,98 +1,91 @@
-# T2GCS — Feature Flags e lista de tarefas
+# Feature Flags na prática
 
-## Trabalho: Feature Flags em Java
+**Trabalho de Gerência de Configuração de Software — T2GCS**
 
-A implementação para o tema do trabalho está em [`feature-flags/`](feature-flags/README.md): Spring Boot, configuração externa recarregada em tempo de execução, liberação gradual por usuário e desligamento sem novo deploy. O [relatório para o artigo](feature-flags/RELATORIO.md) explica a abordagem e suas limitações. A página do GitHub Pages abaixo é uma demonstração independente e não executa o backend Java.
+Implementação em **Java e Spring Boot** para demonstrar a liberação gradual de uma funcionalidade e seu desligamento **sem reiniciar a aplicação ou fazer novo deploy**. Uma flag em arquivo externo controla quais usuários recebem recomendações de tarefas.
 
-Versão web para GitHub Pages em `docs/`: adicione, conclua, filtre e exclua tarefas. Os dados ficam no `localStorage` do navegador, inclusive após recarregar a página. Cada navegador tem sua própria lista; limpar os dados do site apaga as tarefas. Esta versão funciona sem API e sem banco no servidor.
+[![Feature Flags Java](https://github.com/esgarbossa/T2GCS/actions/workflows/feature-flags.yml/badge.svg)](https://github.com/esgarbossa/T2GCS/actions/workflows/feature-flags.yml)
 
-## Publicar apenas pelo GitHub
+[Guia completo](feature-flags/README.md) · [Relatório para o artigo](feature-flags/RELATORIO.md) · [Código da decisão](feature-flags/src/main/java/br/edu/t2gcs/FlagService.java) · [Testes](feature-flags/src/test/java/br/edu/t2gcs/FlagServiceTest.java)
 
-1. No repositório, abra **Settings > Pages**.
-2. Em **Build and deployment > Source**, selecione **GitHub Actions**.
-3. Abra **Actions > Publicar GitHub Pages > Run workflow**, selecione `main` e confirme.
-4. Aguarde a execução terminar e abra a URL informada no ambiente `github-pages` (normalmente https://esgarbossa.github.io/T2GCS/).
+## Executar
 
-Novas alterações na pasta `docs/` serão publicadas automaticamente após o push para `main`. O fluxo publica somente `docs/`, sem incluir banco ou arquivos de configuração do backend. A disponibilidade do Pages para repositórios privados depende do plano GitHub.
+Requisito: JDK 21 ou superior. Os comandos abaixo partem da raiz deste repositório.
 
-Para apresentar: abra o site, cadastre uma tarefa, marque como concluída, alterne os filtros e recarregue para mostrar a persistência local. Na aba Actions, mostre a execução que publicou o site. Explique que HTML e CSS definem a interface, JavaScript trata as ações, `localStorage` salva os dados no navegador e o Pages hospeda os arquivos estáticos.
+**Windows / PowerShell:**
 
-## Backend opcional
-
-O backend original continua disponível em `src/` para estudo ou demonstração separada. Ele não é executado pelo GitHub Pages. As instruções abaixo são específicas da API.
-
-API REST pequena para apresentar um deploy real: Node.js 24, SQLite em arquivo, respostas JSON, validacao, logs de requisicoes, encerramento controlado, Docker e CI no GitHub Actions. Usa apenas recursos do Node, sem pacotes externos.
-
-## Rodar localmente
-
-Instale Node.js 24 e execute na pasta do projeto:
-
-```sh
-npm start
+```powershell
+cd feature-flags
+.\mvnw.cmd verify
+java -jar target/feature-flags-1.0.0.jar
 ```
 
-Abra http://localhost:3000/health. Para desenvolvimento: `npm run dev`. Testes: `npm test`.
-
-As variaveis opcionais sao `PORT` (3000) e `DATABASE_PATH` (`./data/tasks.db`). Para carregar um arquivo de configuracao local, copie `.env.example` para `.env` e execute `node --env-file=.env src/server.js`.
-
-## Rotas
-
-| Metodo | Rota | Comportamento |
-|---|---|---|
-| GET | / | Identificacao e lista de rotas |
-| GET | /health | Verifica aplicacao e acesso ao banco |
-| GET | /tasks | Lista tarefas; aceita ?completed=true ou false |
-| GET | /tasks/:id | Busca uma tarefa |
-| POST | /tasks | Cria com {"title":"Apresentar trabalho"} |
-| PATCH | /tasks/:id | Atualiza title e/ou completed |
-| DELETE | /tasks/:id | Exclui; responde 204 |
-
-POST e PATCH exigem `Content-Type: application/json`. Titulo obrigatorio com ate 120 caracteres; corpo limitado a 16 KB. Erros retornam `error` e `requestId`. Cada requisicao gera um log JSON com status e duracao.
-
-## Demonstracao no terminal
-
-No Windows use `curl.exe` no lugar de `curl` se estiver no PowerShell. No Postman, configure os mesmos metodos, URLs e corpos JSON.
+**Linux / macOS:**
 
 ```sh
-curl http://localhost:3000/health
-curl -X POST http://localhost:3000/tasks -H "Content-Type: application/json" -d '{"title":"Explicar o deploy"}'
-curl http://localhost:3000/tasks
-# Substitua ID pelo id retornado no cadastro:
-curl -X PATCH http://localhost:3000/tasks/ID -H "Content-Type: application/json" -d '{"completed":true}'
-curl http://localhost:3000/tasks?completed=true
-curl -X DELETE http://localhost:3000/tasks/ID
+cd feature-flags
+sh mvnw verify
+java -jar target/feature-flags-1.0.0.jar
 ```
 
-## Deploy com Docker
+O Maven Wrapper baixa o Maven quando necessário. Com o serviço iniciado, abra:
 
-```sh
-docker compose up --build -d
-docker compose logs -f
+- [Experiência do usuário ana](http://localhost:8080/api/experience?userId=ana)
+- [Configuração atual](http://localhost:8080/api/flags)
+- [Saúde da aplicação](http://localhost:8080/actuator/health)
+
+Para executar com Docker, use `docker compose up --build` dentro de `feature-flags/`. O arquivo de configuração é montado fora da imagem.
+
+## O que demonstrar
+
+Mantenha o serviço aberto. Edite e salve [`feature-flags/config/flags.properties`](feature-flags/config/flags.properties), atualizando a consulta após cada alteração:
+
+| Etapa | `recommendations.enabled` | `recommendations.percentage` | Comportamento |
+|---|---|---|---|
+| Desligada | `false` | `0` | Experiência tradicional |
+| Liberação inicial | `true` | `10` | Uma parte dos usuários recebe recomendações |
+| Ampliação | `true` | `50` | O grupo cresce, preservando os usuários anteriores |
+| Liberação total | `true` | `100` | Todos recebem recomendações |
+| Desligamento geral | `false` | `100` | Todos voltam à experiência tradicional |
+
+A configuração é relida em cada avaliação. Um hash estável do identificador do usuário determina seu grupo, com valor de 0 a 99. A funcionalidade é ativada quando a flag está ligada e esse valor é menor que o percentual.
+
+Compare `instanceId` e `startedAt` nas respostas: permanecem iguais durante as alterações. Os percentuais intermediários representam uma distribuição aproximada, não uma quota exata em amostras pequenas.
+
+**Demonstração automática:** com o serviço rodando, abra outro PowerShell em `feature-flags/` e execute `./demo.ps1`. O script percorre as cinco etapas para 100 usuários e restaura o arquivo original ao final.
+
+## Evidências da implementação
+
+Os cinco testes Java passaram na validação local. A demonstração HTTP obteve os resultados abaixo, mantendo a mesma instância:
+
+| Configuração | Usuários com recomendações |
+|---|---|
+| Desligada | 0 de 100 |
+| 10% | 13 de 100 |
+| 50% | 45 de 100 |
+| 100% | 100 de 100 |
+| Desligada novamente | 0 de 100 |
+
+O [relatório](feature-flags/RELATORIO.md) registra o ambiente, a metodologia, os resultados e as limitações. O workflow [Feature Flags Java](https://github.com/esgarbossa/T2GCS/actions/workflows/feature-flags.yml) executa os testes e a construção da imagem Docker. Ele não hospeda a API.
+
+## Estrutura do repositório
+
+```text
+T2GCS/
+├── feature-flags/         # Implementação principal em Java / Spring Boot
+│   ├── config/           # Flag externa, alterável durante a execução
+│   ├── src/main/         # Serviço de avaliação e endpoints HTTP
+│   ├── src/test/         # Testes automatizados
+│   ├── demo.ps1          # Demonstração com 100 usuários
+│   ├── README.md         # Guia de execução e apresentação
+│   └── RELATORIO.md      # Texto para o artigo
+├── examples/node-api/    # Exemplo anterior: API Node.js com SQLite
+├── docs/                 # Exemplo anterior: página estática de tarefas
+└── .github/workflows/    # Testes e publicação do GitHub Pages
 ```
 
-A API fica em http://localhost:3000. O volume `tasks-data` guarda o SQLite entre recriacoes do container. `docker compose down` encerra o servico; adicionar `-v` tambem apaga o banco.
+Os exemplos anteriores têm instruções próprias: [API Node.js](examples/node-api/README.md) e [página de tarefas / GitHub Pages](docs/README.md). São independentes do experimento de flags. O GitHub Pages não executa o serviço Java.
 
-## Deploy no Render
+## Limites do experimento
 
-1. Envie este codigo ao repositorio GitHub.
-2. No Render, escolha **New > Web Service** e conecte o repositorio.
-3. Selecione runtime **Docker**, usando o Dockerfile da raiz.
-4. Configure **Health Check Path** como `/health`. A aplicacao le a variavel `PORT` fornecida pela plataforma.
-5. Para preservar os dados entre deploys, use uma instancia com disco persistente montado em `/app/data`. Sem disco persistente, o SQLite pode ser perdido em reinicios ou novos deploys.
-6. Inicie o deploy e abra `https://SEU-SERVICO.onrender.com/health`. Repita a demonstracao trocando a URL local pela URL publicada.
-
-Consulte os recursos e precos atuais antes de contratar uma instancia ou disco. Nenhuma conta ou recurso de hospedagem e criado automaticamente por este projeto.
-
-Documentacao: https://render.com/docs/web-services e https://render.com/docs/health-checks.
-
-## Roteiro para explicar no trabalho
-
-1. **Codigo:** o cliente envia HTTP; a API valida e grava tarefas no SQLite com consultas parametrizadas.
-2. **Qualidade:** `npm test` verifica CRUD, entradas invalidas e persistencia apos reinicio. O GitHub Actions executa testes e build da imagem em pushes e pull requests.
-3. **Empacotamento:** o Dockerfile define o ambiente e executa a aplicacao com usuario sem privilegios.
-4. **Deploy:** a hospedagem cria o container, define a porta e verifica `/health` antes de encaminhar acessos.
-5. **Demonstracao:** cadastre uma tarefa, liste, conclua e consulte os logs. Reinicie o servico com armazenamento persistente e mostre que os dados continuam salvos.
-
-Escopo didatico: sem login, todas as pessoas com acesso podem alterar tarefas. Use dados ficticios. SQLite atende uma instancia com disco local; multiplas replicas exigiriam outra estrategia de banco. A listagem nao tem paginacao, mantendo o exemplo pequeno.
-
-Referencia SQLite do Node: https://nodejs.org/download/release/latest-v24.x/docs/api/sqlite.html.
+A solução usa um arquivo local e uma única instância. Configuração inválida ou indisponível desliga a funcionalidade. Em produção seriam necessários controle de acesso, auditoria e distribuição consistente da configuração entre instâncias. O identificador de usuário é informado livremente para facilitar a demonstração; uma aplicação real deve usar a identidade autenticada. Desligar uma flag não desfaz efeitos já executados.

@@ -1,5 +1,12 @@
-name: Backend CI
-on: [push, pull_request]
+name: Exemplo Node.js
+on:
+  push:
+    paths: ['examples/node-api/**', '.github/workflows/ci.yml']
+  pull_request:
+    paths: ['examples/node-api/**', '.github/workflows/ci.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -9,4 +16,5 @@ jobs:
         with:
           node-version: 24
       - run: npm test
-      - run: docker build -t t2gcs-api .
+        working-directory: examples/node-api
+      - run: docker build -t t2gcs-api ./examples/node-api
