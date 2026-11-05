@@ -1,0 +1,23 @@
+name: Feature Flags Java
+on:
+  push:
+    paths: ['feature-flags/**', '.github/workflows/feature-flags.yml']
+  pull_request:
+    paths: ['feature-flags/**', '.github/workflows/feature-flags.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+          cache: maven
+          cache-dependency-path: feature-flags/pom.xml
+      - run: mvn -B verify
+        working-directory: feature-flags
+      - run: docker build -t t2gcs-feature-flags ./feature-flags

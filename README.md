@@ -1,4 +1,8 @@
-# T2GCS — Lista de tarefas
+# T2GCS — Feature Flags e lista de tarefas
+
+## Trabalho: Feature Flags em Java
+
+A implementação para o tema do trabalho está em [`feature-flags/`](feature-flags/README.md): Spring Boot, configuração externa recarregada em tempo de execução, liberação gradual por usuário e desligamento sem novo deploy. O [relatório para o artigo](feature-flags/RELATORIO.md) explica a abordagem e suas limitações. A página do GitHub Pages abaixo é uma demonstração independente e não executa o backend Java.
 
 Versão web para GitHub Pages em `docs/`: adicione, conclua, filtre e exclua tarefas. Os dados ficam no `localStorage` do navegador, inclusive após recarregar a página. Cada navegador tem sua própria lista; limpar os dados do site apaga as tarefas. Esta versão funciona sem API e sem banco no servidor.
 
