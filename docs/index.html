@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="Organize suas tarefas com o T2GCS. Simples, direto e salvo no seu navegador.">
+  <title>T2GCS · Suas tarefas</title>
+  <link rel="stylesheet" href="./style.css">
+  <script src="./app.js" defer></script>
+</head>
+<body>
+  <header><a class="brand" href="./"><span class="logo" aria-hidden="true">✓</span> T2GCS<span class="brand-note">/ tarefas</span></a><span class="badge"><span aria-hidden="true">●</span> GitHub Pages</span></header>
+  <main>
+    <section class="intro"><p class="eyebrow">UM PASSO DE CADA VEZ</p><h1>Menos pendências.<br>Mais <span>feito.</span></h1><p>Um lugar simples para organizar o que vem a seguir.</p></section>
+    <section class="workspace" aria-label="Gerenciador de tarefas">
+      <div class="panel-head"><div><h2>Minha lista</h2><p id="summary">Tudo pronto para começar.</p></div><span class="counter" id="counter">0 tarefas</span></div>
+      <form id="task-form"><label class="sr-only" for="title">Nova tarefa</label><input id="title" name="title" maxlength="120" required placeholder="O que você precisa fazer?" autocomplete="off"><button class="primary" type="submit"><span aria-hidden="true">+</span> Adicionar</button></form>
+      <div class="toolbar"><div role="group" aria-label="Filtrar tarefas" class="filters"><button type="button" data-filter="all" aria-pressed="true">Todas</button><button type="button" data-filter="pending" aria-pressed="false">Pendentes</button><button type="button" data-filter="done" aria-pressed="false">Concluídas</button></div><button type="button" class="clear" id="clear">Limpar concluídas</button></div>
+      <ul id="tasks" aria-label="Tarefas"></ul>
+      <div class="empty" id="empty"><span class="empty-icon" aria-hidden="true">✓</span><h3>Sua próxima conquista começa aqui</h3><p>Adicione sua primeira tarefa no campo acima.</p></div>
+      <p class="notice" id="message" role="status" aria-live="polite"></p>
+      <div class="panel-foot"><span aria-hidden="true">↳</span> Salvo neste navegador <span class="foot-detail">· sem cadastro</span></div>
+    </section>
+    <aside><strong>Seu ritmo, sua lista.</strong> Os dados ficam apenas neste navegador e não são compartilhados entre dispositivos.</aside>
+  </main>
+  <footer><span>T2GCS <span class="muted">· Projeto acadêmico</span></span><a href="https://github.com/esgarbossa/T2GCS" target="_blank" rel="noopener noreferrer">Ver projeto no GitHub ↗</a></footer>
+</body>
+</html>

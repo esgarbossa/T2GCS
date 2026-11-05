@@ -1,4 +1,21 @@
-# T2GCS — Backend de tarefas
+# T2GCS — Lista de tarefas
+
+Versão web para GitHub Pages em `docs/`: adicione, conclua, filtre e exclua tarefas. Os dados ficam no `localStorage` do navegador, inclusive após recarregar a página. Cada navegador tem sua própria lista; limpar os dados do site apaga as tarefas. Esta versão funciona sem API e sem banco no servidor.
+
+## Publicar apenas pelo GitHub
+
+1. No repositório, abra **Settings > Pages**.
+2. Em **Build and deployment > Source**, selecione **GitHub Actions**.
+3. Abra **Actions > Publicar GitHub Pages > Run workflow**, selecione `main` e confirme.
+4. Aguarde a execução terminar e abra a URL informada no ambiente `github-pages` (normalmente https://esgarbossa.github.io/T2GCS/).
+
+Novas alterações na pasta `docs/` serão publicadas automaticamente após o push para `main`. O fluxo publica somente `docs/`, sem incluir banco ou arquivos de configuração do backend. A disponibilidade do Pages para repositórios privados depende do plano GitHub.
+
+Para apresentar: abra o site, cadastre uma tarefa, marque como concluída, alterne os filtros e recarregue para mostrar a persistência local. Na aba Actions, mostre a execução que publicou o site. Explique que HTML e CSS definem a interface, JavaScript trata as ações, `localStorage` salva os dados no navegador e o Pages hospeda os arquivos estáticos.
+
+## Backend opcional
+
+O backend original continua disponível em `src/` para estudo ou demonstração separada. Ele não é executado pelo GitHub Pages. As instruções abaixo são específicas da API.
 
 API REST pequena para apresentar um deploy real: Node.js 24, SQLite em arquivo, respostas JSON, validacao, logs de requisicoes, encerramento controlado, Docker e CI no GitHub Actions. Usa apenas recursos do Node, sem pacotes externos.
 
